@@ -205,17 +205,18 @@ const testPlanId = await xray.getTestPlanIssueId('PROJ-100');
 await xray.addTestEnvironmentsToTestExecution(execId, ['Chrome', 'Linux']);
 ```
 
-## Comparaison avec le plugin officiel
+## Comparaison avec les autres plugins
 
-| Fonctionnalité | Plugin Officiel | Ce Plugin |
-|----------------|-----------------|-----------|
-| Import résultats | ✅ | ✅ |
-| Création Test Execution | ❌ Manuel | ✅ Auto |
-| Liaison Test Plan | ❌ | ✅ GraphQL |
-| Environnements dynamiques | ❌ | ✅ |
-| Upload attachments | ❌ | ✅ |
-| Description enrichie | ❌ | ✅ ADF |
-| Multi-projets Playwright | ❌ | ✅ |
+| Fonctionnalité | @xray-app/junit-reporter | playwright-xray (inluxc) | Ce Plugin |
+|----------------|--------------------------|--------------------------|-----------|
+| Import résultats | ✅ (via XML) | ✅ | ✅ |
+| Création Test Execution | ❌ Manuel | ✅ | ✅ |
+| Liaison Test Plan | ❌ | ✅ | ✅ GraphQL |
+| Environnements | ❌ | ✅ | ✅ Auto depuis projets PW |
+| Upload attachments JIRA | ❌ | ❌ | ✅ |
+| Description ADF enrichie | ❌ | ❌ | ✅ |
+| Multi-projets en 1 run | ✅ | ❌ (1er seulement) | ✅ |
+| Patterns extraction clé | Via annotations | 1 pattern | 4 patterns + custom + mapping |
 
 ## Troubleshooting
 
