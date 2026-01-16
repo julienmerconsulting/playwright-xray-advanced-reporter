@@ -1,0 +1,35 @@
+{
+  "name": "playwright-xray-advanced-reporter",
+  "version": "1.0.0",
+  "description": "Advanced Playwright Reporter for Xray Cloud - Full API integration with Test Plans, Environments, and Attachments",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "playwright",
+    "xray",
+    "jira",
+    "test-management",
+    "reporter",
+    "automation"
+  ],
+  "author": "JMer Consulting",
+  "license": "MIT",
+  "peerDependencies": {
+    "@playwright/test": ">=1.20.0"
+  },
+  "dependencies": {
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}
