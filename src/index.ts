@@ -14,6 +14,7 @@
 
 // Reporter principal
 export { XrayAdvancedReporter, default } from './reporter';
+export { CypressXrayReporter, registerCypressXrayReporter } from './cypress-plugin';
 
 // Clients API
 export { JiraClient } from './clients/jira-client';
@@ -39,6 +40,7 @@ export {
   formatDuration,
   extractTestKeyFromTitle,
   mapPlaywrightStatusToXray,
+  mapTestStatusToXray,
   createAdfText,
   createAdfParagraph,
   createAdfHeading,

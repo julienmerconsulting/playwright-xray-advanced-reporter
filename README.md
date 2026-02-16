@@ -1,8 +1,8 @@
 # playwright-xray-advanced-reporter
 
-Reporter Playwright avancé pour **Xray Cloud** avec intégration complète JIRA.
+Reporter avancé pour **Xray Cloud** avec intégration complète JIRA, compatible **Playwright** et **Cypress**.
 
-Plus puissant que le plugin officiel `@xray-app/reporter-playwright` :
+Plus puissant que les plugins basiques XML/JUnit :
 - ✅ Création automatique de Test Execution dans JIRA
 - ✅ Import des résultats avec statuts détaillés  
 - ✅ Liaison automatique au Test Plan via GraphQL
@@ -127,6 +127,48 @@ JIRA_API_TOKEN=votre_token_jira
 XRAY_CLIENT_ID=votre_client_id_xray
 XRAY_CLIENT_SECRET=votre_client_secret_xray
 ```
+
+
+## Configuration Cypress
+
+Le package expose aussi un plugin Node pour Cypress qui reproduit le même workflow:
+- création automatique de Test Execution
+- import des statuts dans Xray
+- liaison Test Plan
+- ajout des environnements
+- upload screenshots/vidéos
+
+### cypress.config.ts
+
+```typescript
+import { defineConfig } from 'cypress';
+import { registerCypressXrayReporter } from 'playwright-xray-advanced-reporter';
+
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      registerCypressXrayReporter(on, config, {
+        jiraBaseUrl: 'https://votre-instance.atlassian.net',
+        jiraEmail: 'votre.email@company.com',
+        jiraApiToken: process.env.JIRA_API_TOKEN!,
+        projectKey: 'PROJ',
+        xrayClientId: process.env.XRAY_CLIENT_ID!,
+        xrayClientSecret: process.env.XRAY_CLIENT_SECRET!,
+        testPlanKey: 'PROJ-123',
+        testExecutionSummaryPrefix: 'Cypress Execution',
+        testExecutionLabels: ['Automation', 'Cypress'],
+        uploadScreenshotsOnFailure: true,
+        uploadVideos: true,
+        verbose: true,
+      });
+
+      return config;
+    },
+  },
+});
+```
+
+> Les clés Xray sont extraites avec les mêmes patterns qu'en Playwright (`[PROJ-123]`, `@PROJ-123`, etc.) ou via `testKeyMapping`.
 
 ## Nommage des tests
 

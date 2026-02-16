@@ -74,10 +74,10 @@ export function extractTestKeyFromTitle(
 }
 
 /**
- * Convertit le statut Playwright en statut Xray
+ * Convertit un statut de test (Playwright/Cypress) en statut Xray
  */
-export function mapPlaywrightStatusToXray(
-  status: PlaywrightTestDetails['status']
+export function mapTestStatusToXray(
+  status: PlaywrightTestDetails['status'] | 'pending'
 ): XrayTestResult['status'] {
   switch (status) {
     case 'passed':
@@ -87,10 +87,20 @@ export function mapPlaywrightStatusToXray(
     case 'interrupted':
       return 'FAILED';
     case 'skipped':
+    case 'pending':
       return 'SKIPPED';
     default:
       return 'TODO';
   }
+}
+
+/**
+ * Compat historique Playwright
+ */
+export function mapPlaywrightStatusToXray(
+  status: PlaywrightTestDetails['status']
+): XrayTestResult['status'] {
+  return mapTestStatusToXray(status);
 }
 
 /**

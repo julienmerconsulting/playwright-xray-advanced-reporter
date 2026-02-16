@@ -14,12 +14,14 @@
     "jira",
     "test-management",
     "reporter",
-    "automation"
+    "automation",
+    "cypress"
   ],
   "author": "JMer Consulting",
   "license": "MIT",
   "peerDependencies": {
-    "@playwright/test": ">=1.20.0"
+    "@playwright/test": ">=1.20.0",
+    "cypress": ">=10.0.0"
   },
   "dependencies": {
     "form-data": "^4.0.0"
