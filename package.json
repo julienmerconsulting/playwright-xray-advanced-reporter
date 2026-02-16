@@ -33,5 +33,13 @@
   },
   "files": [
     "dist/**/*"
-  ]
+  ],
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    },
+    "cypress": {
+      "optional": true
+    }
+  }
 }

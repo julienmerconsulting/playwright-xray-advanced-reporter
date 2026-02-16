@@ -15,17 +15,17 @@ import {
 
 type CypressPluginOn = (eventName: string, handler: (...args: any[]) => any) => void;
 
-type InternalStatus = 'passed' | 'failed' | 'skipped' | 'timedOut' | 'interrupted';
+type InternalStatus = 'passed' | 'failed' | 'skipped' | 'pending' | 'timedOut' | 'interrupted';
 
 interface CypressTestDetails {
   title: string;
   fullTitle: string;
   file: string;
-  line: number;
-  column: number;
   projectName: string;
   duration: number;
   status: InternalStatus;
+  start: Date;
+  finish: Date;
   error?: string;
 }
 
@@ -135,16 +135,17 @@ export class CypressXrayReporter {
       const attempt = test.attempts?.[test.attempts.length - 1];
       const status = this.mapCypressStatusToInternal(test.state);
       const errorMessage = attempt?.error?.message || attempt?.error?.stack;
+      const timing = this.extractAttemptTiming(attempt);
 
       const details: CypressTestDetails = {
         title,
         fullTitle,
         file: spec?.relative || spec?.name || 'unknown',
-        line: 0,
-        column: 0,
         projectName,
-        duration: attempt?.wallClockDuration || 0,
+        duration: timing.duration,
         status,
+        start: timing.start,
+        finish: timing.finish,
         error: errorMessage,
       };
 
@@ -160,11 +161,27 @@ export class CypressXrayReporter {
       case 'failed':
         return 'failed';
       case 'pending':
+        return 'pending';
       case 'skipped':
         return 'skipped';
       default:
         return 'interrupted';
     }
+  }
+
+  private extractAttemptTiming(attempt?: any): { start: Date; finish: Date; duration: number } {
+    const runEnd = new Date();
+    const duration = Number(attempt?.wallClockDuration) || 0;
+    const startedAt = attempt?.wallClockStartedAt ? new Date(attempt.wallClockStartedAt) : null;
+
+    if (startedAt && !Number.isNaN(startedAt.getTime())) {
+      const finish = new Date(startedAt.getTime() + duration);
+      return { start: startedAt, finish, duration };
+    }
+
+    const finish = runEnd;
+    const start = new Date(finish.getTime() - duration);
+    return { start, finish, duration };
   }
 
   private collectAttachmentsFromSpecResults(results: any, status: InternalStatus): void {
@@ -207,13 +224,18 @@ export class CypressXrayReporter {
 
     const duration = this.endTime.getTime() - this.startTime.getTime();
 
-    await this.createTestExecutionInJira(duration);
-    await this.importResultsToXray();
-    await this.linkTestExecutionToTestPlan();
-    await this.addTestEnvironments(cypressConfig);
-    await this.uploadAttachments();
+    try {
+      await this.createTestExecutionInJira(duration, cypressConfig);
+      await this.importResultsToXray();
+      await this.linkTestExecutionToTestPlan();
+      await this.addTestEnvironments(cypressConfig);
+      await this.uploadAttachments();
 
-    this.logger.success(`Reporting terminé: ${this.testExecutionKey}`);
+      this.logger.success(`Reporting terminé: ${this.testExecutionKey}`);
+    } catch (error) {
+      this.logger.error('Erreur globale pendant le reporting Cypress:', error);
+      throw error;
+    }
   }
 
   private async resolveTestPlan(): Promise<void> {
@@ -238,7 +260,7 @@ export class CypressXrayReporter {
     for (const details of this.testResults.values()) {
       if (details.status === 'passed') passed++;
       else if (details.status === 'failed' || details.status === 'timedOut' || details.status === 'interrupted') failed++;
-      else if (details.status === 'skipped') skipped++;
+      else if (details.status === 'skipped' || details.status === 'pending') skipped++;
     }
 
     return {
@@ -269,9 +291,9 @@ export class CypressXrayReporter {
     return Array.from(environments);
   }
 
-  private async createTestExecutionInJira(duration: number): Promise<void> {
+  private async createTestExecutionInJira(duration: number, cypressConfig?: any): Promise<void> {
     const stats = this.calculateStats();
-    const environments = this.collectEnvironments();
+    const environments = this.collectEnvironments(cypressConfig);
 
     const summary = generateTestExecutionSummary(
       this.config.testExecutionSummaryPrefix!,
@@ -302,7 +324,7 @@ export class CypressXrayReporter {
 
   private buildTestComment(details: CypressTestDetails): string {
     const lines = [
-      `📁 Fichier: ${details.file}:${details.line}`,
+      `📁 Fichier: ${details.file}`,
       `⏱️ Durée: ${details.duration}ms`,
       `🖥️ Projet: ${details.projectName}`,
     ];
@@ -321,8 +343,8 @@ export class CypressXrayReporter {
       tests.push({
         testKey,
         status: mapTestStatusToXray(details.status),
-        start: formatDateISO(this.startTime),
-        finish: formatDateISO(this.endTime),
+        start: formatDateISO(details.start),
+        finish: formatDateISO(details.finish),
         comment: this.buildTestComment(details),
       });
     }
