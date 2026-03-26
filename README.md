@@ -1,64 +1,68 @@
-# playwright-xray-advanced-reporter
+# 🎭 playwright-xray-advanced-reporter
 
-Reporter Playwright avancé pour **Xray Cloud** avec intégration complète JIRA.
+**Advanced Playwright Reporter for Xray Cloud** with complete JIRA integration.
 
-Plus puissant que le plugin officiel `@xray-app/reporter-playwright` :
-- ✅ Création automatique de Test Execution dans JIRA
-- ✅ Import des résultats avec statuts détaillés  
-- ✅ Liaison automatique au Test Plan via GraphQL
-- ✅ Gestion des environnements de test Xray
-- ✅ Upload automatique des screenshots, traces et vidéos
-- ✅ Description enrichie avec métriques (pass rate, durée, etc.)
-- ✅ Support des projets Playwright multi-navigateurs
+More powerful than the official `@xray-app/reporter-playwright` plugin:
+- ✅ Automatic Test Execution creation in JIRA
+- ✅ Import results with detailed statuses  
+- ✅ Automatic Test Plan linking via GraphQL
+- ✅ Full Xray test environment management
+- ✅ Automatic screenshot, trace, and video uploads
+- ✅ Rich descriptions with metrics (pass rate, duration, etc.)
+- ✅ Multi-browser Playwright project support
 
-## Installation
+---
 
-### Depuis npm (quand publié)
+## 📦 Installation
+
+### From npm (now available!)
 ```bash
 npm install playwright-xray-advanced-reporter
 ```
 
-### Depuis GitHub
+### From GitHub
 ```bash
-npm install github:USERNAME/playwright-xray-advanced-reporter
+npm install github:julienmerconsulting/playwright-xray-advanced-reporter
 ```
 
-### Installation locale (recommandé pour tester)
+### Local installation (recommended for testing)
 
-**Option 1 : Depuis un dossier externe**
+**Option 1: External folder**
 ```bash
-# Dézipper quelque part
+# Extract somewhere
 unzip playwright-xray-advanced-reporter.zip -d C:\tools\playwright-xray-reporter
 
-# Dans ton projet Playwright
-cd mon-projet-playwright/
+# In your Playwright project
+cd your-playwright-project/
 npm install C:\tools\playwright-xray-reporter
 ```
 
-**Option 2 : Dans le projet (recommandé)**
+**Option 2: Project-embedded (recommended)**
 ```
-mon-projet-playwright/
+your-playwright-project/
 ├── libs/
-│   └── playwright-xray-advanced-reporter/   ← coller le dossier ici
+│   └── playwright-xray-advanced-reporter/   ← drop it here
 ├── tests/
 ├── playwright.config.ts
 └── package.json
 ```
 
-Puis :
+Then:
 ```bash
 npm install ./libs/playwright-xray-advanced-reporter
 ```
 
-### Vérifier l'installation
+### Verify installation
 ```bash
-# Lancer les tests du plugin
+# Run the plugin tests
 cd libs/playwright-xray-advanced-reporter
 npm install
 npx ts-node test-plugin.ts && npx ts-node test-integration.ts
 ```
 
-## Configuration
+---
+
+## ⚙️ Configuration
 
 ### playwright.config.ts
 
@@ -68,8 +72,8 @@ import type { XrayReporterConfig } from 'playwright-xray-advanced-reporter';
 
 const xrayConfig: XrayReporterConfig = {
   // === JIRA Cloud ===
-  jiraBaseUrl: 'https://votre-instance.atlassian.net',
-  jiraEmail: 'votre.email@company.com',
+  jiraBaseUrl: 'https://your-instance.atlassian.net',
+  jiraEmail: 'your.email@company.com',
   jiraApiToken: process.env.JIRA_API_TOKEN!,
   projectKey: 'PROJ',
 
@@ -77,15 +81,15 @@ const xrayConfig: XrayReporterConfig = {
   xrayClientId: process.env.XRAY_CLIENT_ID!,
   xrayClientSecret: process.env.XRAY_CLIENT_SECRET!,
 
-  // === Test Plan (optionnel) ===
-  testPlanKey: 'PROJ-123',  // OU
-  // testPlanSummary: 'Mon Test Plan Sprint 42',
+  // === Test Plan (optional) ===
+  testPlanKey: 'PROJ-123',  // OR
+  // testPlanSummary: 'My Sprint 42 Test Plan',
 
-  // === Options Test Execution ===
+  // === Test Execution Options ===
   testExecutionSummaryPrefix: 'Playwright Execution',
   testExecutionLabels: ['Automation', 'Playwright', 'Regression'],
 
-  // === Environnements ===
+  // === Test Environments ===
   testEnvironments: ['Chrome', 'Windows'],
 
   // === Attachments ===
@@ -93,12 +97,12 @@ const xrayConfig: XrayReporterConfig = {
   uploadTraces: true,
   uploadVideos: false,
 
-  // === Mapping des tests ===
-  testKeyPattern: /\[([A-Z]+-\d+)\]/,  // Pattern regex personnalisé
-  // OU mapping explicite :
+  // === Test Key Mapping ===
+  testKeyPattern: /\[([A-Z]+-\d+)\]/,  // Custom regex pattern
+  // OR explicit mapping:
   // testKeyMapping: {
-  //   'Mon test login': 'PROJ-456',
-  //   'Mon test checkout': 'PROJ-789',
+  //   'My login test': 'PROJ-456',
+  //   'My checkout test': 'PROJ-789',
   // },
 
   // === Debug ===
@@ -118,124 +122,140 @@ export default defineConfig({
 });
 ```
 
-### Variables d'environnement
+### Environment Variables
 
-Créez un fichier `.env` (ne pas committer) :
+Create a `.env` file (don't commit):
 
 ```env
-JIRA_API_TOKEN=votre_token_jira
-XRAY_CLIENT_ID=votre_client_id_xray
-XRAY_CLIENT_SECRET=votre_client_secret_xray
+JIRA_API_TOKEN=your_jira_token
+XRAY_CLIENT_ID=your_xray_client_id
+XRAY_CLIENT_SECRET=your_xray_client_secret
 ```
 
-## Nommage des tests
+---
 
-Pour que le reporter associe vos tests aux Tests Xray, incluez la clé dans le titre :
+## 🏷️ Test Naming
+
+Link tests to Xray by including the test key in the title:
 
 ```typescript
-// ✅ Patterns supportés
-test('[PROJ-123] Vérifier le login', async ({ page }) => { ... });
-test('PROJ-123 - Vérifier le login', async ({ page }) => { ... });
-test('Vérifier le login @PROJ-123', async ({ page }) => { ... });
-test('Vérifier le login (PROJ-123)', async ({ page }) => { ... });
+// ✅ Supported patterns
+test('[PROJ-123] Check login flow', async ({ page }) => { ... });
+test('PROJ-123 - Check login flow', async ({ page }) => { ... });
+test('Check login flow @PROJ-123', async ({ page }) => { ... });
+test('Check login flow (PROJ-123)', async ({ page }) => { ... });
 
-// ✅ Ou via describe
-test.describe('[PROJ-100] Module Auth', () => {
-  test('[PROJ-123] Login valide', async ({ page }) => { ... });
-  test('[PROJ-124] Login invalide', async ({ page }) => { ... });
+// ✅ Or via describe blocks
+test.describe('[PROJ-100] Auth Module', () => {
+  test('[PROJ-123] Valid login', async ({ page }) => { ... });
+  test('[PROJ-124] Invalid credentials', async ({ page }) => { ... });
 });
 ```
 
-## Fonctionnalités détaillées
+---
 
-### Création automatique de Test Execution
+## 🚀 Key Features
 
-À chaque exécution, le reporter :
-1. Crée une nouvelle issue "Test Execution" dans JIRA
-2. Ajoute les labels configurés
-3. Génère une description avec un tableau de métriques :
+### Automatic Test Execution Creation
+
+On every run, the reporter:
+1. Creates a new "Test Execution" issue in JIRA
+2. Adds configured labels
+3. Generates a description with metrics table:
    - Total tests / Passed / Failed / Skipped
-   - Pass rate en pourcentage
-   - Durée totale
-   - Environnements utilisés
+   - Pass rate percentage
+   - Total duration
+   - Test environments used
 
-### Import des résultats vers Xray
+### Result Import to Xray
 
-Les résultats sont importés via l'API REST Xray :
-- Statuts : PASSED, FAILED, SKIPPED, TODO
-- Timestamps de début/fin
-- Commentaires avec fichier, ligne, erreur
+Results are imported via Xray REST API:
+- Statuses: PASSED, FAILED, SKIPPED, TODO
+- Start/end timestamps
+- Comments with file, line, and error details
 
-### Liaison au Test Plan
+### Test Plan Linking
 
-Si un Test Plan est configuré, le reporter :
-1. Récupère l'issueId Xray via GraphQL
-2. Associe la Test Execution au Test Plan
-3. Les résultats apparaissent dans la vue Test Plan
+If a Test Plan is configured, the reporter:
+1. Fetches the Xray issueId via GraphQL
+2. Associates the Test Execution with the Test Plan
+3. Results appear in the Test Plan view
 
-### Environnements de test
+### Test Environments
 
-Les environnements sont ajoutés automatiquement :
-- Depuis la config `testEnvironments`
-- Depuis les noms de projets Playwright (`chromium`, `firefox`, etc.)
+Environments are added automatically:
+- From the `testEnvironments` config
+- From Playwright project names (`chromium`, `firefox`, etc.)
 
-### Upload des attachments
+### Attachment Uploads
 
-En cas d'échec, le reporter peut uploader :
+On test failures, the reporter can upload:
 - Screenshots (via JIRA API)
-- Traces Playwright (`.zip`)
-- Vidéos d'exécution
+- Playwright traces (`.zip`)
+- Test execution videos
 
-## API avancée
+---
 
-Vous pouvez utiliser les clients directement :
+## 🔌 Advanced API Usage
+
+Use the clients directly for more control:
 
 ```typescript
 import { JiraClient, XrayClient } from 'playwright-xray-advanced-reporter';
 
-// Client JIRA
+// JIRA Client
 const jira = new JiraClient(baseUrl, email, apiToken);
 await jira.searchIssuesByJql('project = PROJ AND type = Bug');
 await jira.addAttachment('PROJ-123', './screenshot.png');
 
-// Client Xray
+// Xray Client
 const xray = new XrayClient(clientId, clientSecret);
 await xray.authenticate();
 const testPlanId = await xray.getTestPlanIssueId('PROJ-100');
 await xray.addTestEnvironmentsToTestExecution(execId, ['Chrome', 'Linux']);
 ```
 
-## Comparaison avec les autres plugins
+---
 
-| Fonctionnalité | @xray-app/junit-reporter | playwright-xray (inluxc) | Ce Plugin |
-|----------------|--------------------------|--------------------------|-----------|
-| Import résultats | ✅ (via XML) | ✅ | ✅ |
-| Création Test Execution | ❌ Manuel | ✅ | ✅ |
-| Liaison Test Plan | ❌ | ✅ | ✅ GraphQL |
-| Environnements | ❌ | ✅ | ✅ Auto depuis projets PW |
-| Upload attachments JIRA | ❌ | ❌ | ✅ |
-| Description ADF enrichie | ❌ | ❌ | ✅ |
-| Multi-projets en 1 run | ✅ | ❌ (1er seulement) | ✅ |
-| Patterns extraction clé | Via annotations | 1 pattern | 4 patterns + custom + mapping |
+## 📊 Feature Comparison
 
-## Troubleshooting
+| Feature | @xray-app/junit-reporter | playwright-xray (inluxc) | This Plugin |
+|---------|--------------------------|--------------------------|-----------|
+| Import results | ✅ (via XML) | ✅ | ✅ |
+| Auto Test Execution | ❌ Manual | ✅ | ✅ |
+| Test Plan linking | ❌ | ✅ | ✅ GraphQL |
+| Environments | ❌ | ✅ | ✅ Auto from PW projects |
+| JIRA attachments | ❌ | ❌ | ✅ |
+| Rich ADF descriptions | ❌ | ❌ | ✅ |
+| Multi-project in 1 run | ✅ | ❌ (1st only) | ✅ |
+| Key extraction patterns | Via annotations | 1 pattern | 4 patterns + custom + mapping |
+
+---
+
+## 🔧 Troubleshooting
 
 ### "Test Execution type not found"
 
-Vérifiez que Xray est bien installé sur votre projet JIRA et que le type "Test Execution" existe.
+Make sure Xray is installed on your JIRA project and the "Test Execution" issue type exists.
 
 ### "Authentication failed"
 
-- JIRA : Créez un API token sur https://id.atlassian.com/manage-profile/security/api-tokens
-- Xray : Créez des API Keys sur https://xray.cloud.getxray.app/settings/api-keys
+- **JIRA**: Create an API token at https://id.atlassian.com/manage-profile/security/api-tokens
+- **Xray**: Create API keys at https://xray.cloud.getxray.app/settings/api-keys
 
 ### "Test key not found"
 
-Assurez-vous que :
-1. Le test existe dans Xray avec cette clé
-2. Le pattern regex capture bien la clé
-3. Activez `verbose: true` pour voir les clés détectées
+Ensure:
+1. The test exists in Xray with that key
+2. Your regex pattern correctly captures the key
+3. Enable `verbose: true` to see detected keys
 
-## License
+---
+
+## 📄 License
 
 MIT - JMer Consulting
+
+---
+
+**Questions? Found a bug?** Open an issue on [GitHub](https://github.com/julienmerconsulting/playwright-xray-advanced-reporter) 🙌
