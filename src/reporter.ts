@@ -137,7 +137,7 @@ export class XrayAdvancedReporter implements Reporter {
    */
   onTestEnd(test: TestCase, result: TestResult): void {
     const testKey = this.resolveTestKey(test);
-
+    
     if (!testKey) {
       this.logger.debug(`Test skipped (no Xray key): ${test.title}`);
       return;
@@ -162,7 +162,7 @@ export class XrayAdvancedReporter implements Reporter {
     };
 
     this.testResults.set(testKey, details);
-
+    
     const statusEmoji = result.status === 'passed' ? '✅' :
                         result.status === 'failed' ? '❌' : '⏭️';
     this.logger.debug(`${statusEmoji} ${testKey}: ${test.title} (${result.duration}ms)`);
