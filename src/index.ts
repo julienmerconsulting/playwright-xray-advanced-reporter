@@ -1,21 +1,21 @@
 /**
  * playwright-xray-advanced-reporter
- * 
- * Reporter Playwright avancé pour Xray Cloud avec support complet :
- * - Création automatique de Test Execution
- * - Import des résultats avec statuts détaillés
- * - Liaison Test Plan via GraphQL
- * - Gestion des environnements de test
- * - Upload des screenshots, traces et vidéos
- * 
+ *
+ * Advanced Playwright reporter for Xray Cloud with full support:
+ * - Automatic Test Execution creation
+ * - Result import with detailed statuses
+ * - Test Plan linking via GraphQL
+ * - Test environments handling
+ * - Uploads screenshots, traces and videos
+ *
  * @author JMer Consulting
  * @license MIT
  */
 
-// Reporter principal
+// Main reporter
 export { XrayAdvancedReporter, default } from './reporter';
 
-// Clients API
+// API clients
 export { JiraClient } from './clients/jira-client';
 export { XrayClient } from './clients/xray-client';
 
@@ -32,7 +32,7 @@ export type {
   JiraAdfDocument,
 } from './types';
 
-// Utilitaires
+// Utilities
 export {
   Logger,
   formatDateISO,
