@@ -1,3 +1,8 @@
+[![npm version](https://img.shields.io/npm/v/playwright-xray-advanced-reporter.svg)](https://www.npmjs.com/package/playwright-xray-advanced-reporter)
+[![npm downloads](https://img.shields.io/npm/dm/playwright-xray-advanced-reporter.svg)](https://www.npmjs.com/package/playwright-xray-advanced-reporter)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+[![Playwright](https://img.shields.io/badge/playwright-1.20+-0A9EDC.svg)](https://playwright.dev)
+
 # 🎭 playwright-xray-advanced-reporter
 
 **Advanced Playwright Reporter for Xray Cloud** with complete JIRA integration.
