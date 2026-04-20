@@ -9,8 +9,8 @@ import {
 } from '../types';
 
 /**
- * Client pour l'API REST JIRA v3
- * Gère toutes les interactions avec JIRA Cloud
+ * Client for the JIRA REST API v3.
+ * Handles all interactions with JIRA Cloud.
  */
 export class JiraClient {
   private baseUrl: string;
@@ -23,7 +23,7 @@ export class JiraClient {
   }
 
   /**
-   * Récupère les informations d'un projet JIRA
+   * Fetches information about a JIRA project.
    */
   async getProjectInfo(projectKey: string): Promise<JiraProject> {
     const response = await fetch(
@@ -39,7 +39,7 @@ export class JiraClient {
 
     if (!response.ok) {
       throw new Error(
-        `[JIRA] Échec récupération projet ${projectKey}: ${response.status} ${response.statusText}`
+        `[JIRA] Failed to fetch project ${projectKey}: ${response.status} ${response.statusText}`
       );
     }
 
@@ -47,7 +47,7 @@ export class JiraClient {
   }
 
   /**
-   * Recherche des issues via JQL
+   * Searches issues via JQL.
    */
   async searchIssuesByJql(
     jql: string,
@@ -73,7 +73,7 @@ export class JiraClient {
 
     if (!response.ok) {
       throw new Error(
-        `[JIRA] Échec recherche JQL: ${response.status} ${response.statusText}`
+        `[JIRA] JQL search failed: ${response.status} ${response.statusText}`
       );
     }
 
@@ -81,7 +81,7 @@ export class JiraClient {
   }
 
   /**
-   * Recherche un Test Plan par son summary
+   * Searches a Test Plan by its summary.
    */
   async findTestPlanBySummary(
     summary: string,
@@ -97,7 +97,7 @@ export class JiraClient {
   }
 
   /**
-   * Crée une nouvelle Test Execution
+   * Creates a new Test Execution.
    */
   async createTestExecution(
     projectId: string,
@@ -132,7 +132,7 @@ export class JiraClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[JIRA] Échec création Test Execution: ${response.status} - ${errorBody}`
+        `[JIRA] Failed to create Test Execution: ${response.status} - ${errorBody}`
       );
     }
 
@@ -140,7 +140,7 @@ export class JiraClient {
   }
 
   /**
-   * Crée un lien entre deux issues (Test Plan ↔ Test Execution)
+   * Creates a link between two issues (Test Plan ↔ Test Execution).
    */
   async createIssueLink(
     inwardKey: string,
@@ -164,13 +164,13 @@ export class JiraClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[JIRA] Échec création lien ${inwardKey} → ${outwardKey}: ${response.status} - ${errorBody}`
+        `[JIRA] Failed to create link ${inwardKey} → ${outwardKey}: ${response.status} - ${errorBody}`
       );
     }
   }
 
   /**
-   * Ajoute un lien distant (vers Katalon TestOps ou autre)
+   * Adds a remote link (to Katalon TestOps or similar).
    */
   async createRemoteLink(
     issueKey: string,
@@ -195,17 +195,17 @@ export class JiraClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[JIRA] Échec création remote link sur ${issueKey}: ${response.status} - ${errorBody}`
+        `[JIRA] Failed to create remote link on ${issueKey}: ${response.status} - ${errorBody}`
       );
     }
   }
 
   /**
-   * Ajoute une pièce jointe à une issue
+   * Adds an attachment to an issue.
    */
   async addAttachment(issueKey: string, filePath: string): Promise<void> {
     if (!fs.existsSync(filePath)) {
-      throw new Error(`[JIRA] Fichier non trouvé: ${filePath}`);
+      throw new Error(`[JIRA] File not found: ${filePath}`);
     }
 
     const form = new FormData();
@@ -231,13 +231,13 @@ export class JiraClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[JIRA] Échec upload attachment sur ${issueKey}: ${response.status} - ${errorBody}`
+        `[JIRA] Failed to upload attachment on ${issueKey}: ${response.status} - ${errorBody}`
       );
     }
   }
 
   /**
-   * Ajoute plusieurs pièces jointes à une issue
+   * Adds multiple attachments to an issue.
    */
   async addMultipleAttachments(
     issueKey: string,
@@ -252,7 +252,7 @@ export class JiraClient {
         success.push(filePath);
       } catch (error) {
         failed.push(filePath);
-        console.error(`[JIRA] Échec upload ${filePath}:`, error);
+        console.error(`[JIRA] Failed to upload ${filePath}:`, error);
       }
     }
 
@@ -260,7 +260,7 @@ export class JiraClient {
   }
 
   /**
-   * Effectue une transition sur une issue
+   * Performs a transition on an issue.
    */
   async transitionIssue(issueKey: string, transitionId: string): Promise<void> {
     const response = await fetch(
@@ -281,13 +281,13 @@ export class JiraClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[JIRA] Échec transition ${issueKey}: ${response.status} - ${errorBody}`
+        `[JIRA] Failed transition on ${issueKey}: ${response.status} - ${errorBody}`
       );
     }
   }
 
   /**
-   * Met à jour les champs d'une issue
+   * Updates the fields of an issue.
    */
   async updateIssueFields(
     issueKey: string,
@@ -309,19 +309,19 @@ export class JiraClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[JIRA] Échec mise à jour ${issueKey}: ${response.status} - ${errorBody}`
+        `[JIRA] Failed to update ${issueKey}: ${response.status} - ${errorBody}`
       );
     }
   }
 
   /**
-   * Récupère l'ID du type d'issue "Test Execution" pour le projet
+   * Fetches the "Test Execution" issue type ID for the project.
    */
   async getTestExecutionIssueTypeId(projectKey: string): Promise<string> {
     const project = await this.getProjectInfo(projectKey);
 
     if (!project.issueTypes) {
-      // Récupérer les types d'issues séparément
+      // Fetch issue types separately
       const response = await fetch(
         `${this.baseUrl}/rest/api/3/issuetype/project?projectId=${project.id}`,
         {
@@ -335,7 +335,7 @@ export class JiraClient {
 
       if (!response.ok) {
         throw new Error(
-          `[JIRA] Échec récupération types d'issues: ${response.status}`
+          `[JIRA] Failed to fetch issue types: ${response.status}`
         );
       }
 
@@ -351,7 +351,7 @@ export class JiraClient {
 
       if (!testExecType) {
         throw new Error(
-          `[JIRA] Type "Test Execution" non trouvé dans le projet ${projectKey}`
+          `[JIRA] "Test Execution" type not found in project ${projectKey}`
         );
       }
 
@@ -366,7 +366,7 @@ export class JiraClient {
 
     if (!testExecType) {
       throw new Error(
-        `[JIRA] Type "Test Execution" non trouvé dans le projet ${projectKey}`
+        `[JIRA] "Test Execution" type not found in project ${projectKey}`
       );
     }
 
