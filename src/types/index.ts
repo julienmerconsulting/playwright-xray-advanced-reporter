@@ -1,61 +1,61 @@
 /**
- * Configuration du Reporter Xray Advanced
+ * Configuration of the Xray Advanced Reporter.
  */
 export interface XrayReporterConfig {
-  /** URL de l'instance JIRA (ex: https://moninstance.atlassian.net) */
+  /** URL of the JIRA instance (e.g. https://myinstance.atlassian.net) */
   jiraBaseUrl: string;
   
-  /** Email du compte JIRA */
+  /** JIRA account email */
   jiraEmail: string;
   
-  /** Token API JIRA */
+  /** JIRA API token */
   jiraApiToken: string;
   
-  /** Clé du projet JIRA (ex: PROJ) */
+  /** JIRA project key (e.g. PROJ) */
   projectKey: string;
   
-  /** Client ID Xray Cloud */
+  /** Xray Cloud Client ID */
   xrayClientId: string;
   
-  /** Client Secret Xray Cloud */
+  /** Xray Cloud Client Secret */
   xrayClientSecret: string;
   
-  /** Clé du Test Plan existant (optionnel - si non fourni, recherche par summary) */
+  /** Existing Test Plan key (optional - if not provided, search by summary) */
   testPlanKey?: string;
   
-  /** Summary du Test Plan pour recherche automatique */
+  /** Test Plan summary for automatic lookup */
   testPlanSummary?: string;
   
-  /** Préfixe pour le summary de la Test Execution créée */
+  /** Prefix for the created Test Execution summary */
   testExecutionSummaryPrefix?: string;
   
-  /** Labels à ajouter à la Test Execution */
+  /** Labels to add to the Test Execution */
   testExecutionLabels?: string[];
   
-  /** Environnements de test (ex: ['Chrome', 'Windows']) */
+  /** Test environments (e.g. ['Chrome', 'Windows']) */
   testEnvironments?: string[];
   
-  /** Upload automatique des screenshots en cas d'échec */
+  /** Automatic screenshot upload on failure */
   uploadScreenshotsOnFailure?: boolean;
   
-  /** Upload automatique des traces Playwright */
+  /** Automatic upload of Playwright traces */
   uploadTraces?: boolean;
   
-  /** Upload automatique des vidéos */
+  /** Automatic video upload */
   uploadVideos?: boolean;
   
-  /** Mapping des noms de tests Playwright vers les clés Xray */
+  /** Mapping of Playwright test names to Xray keys */
   testKeyMapping?: Record<string, string>;
   
-  /** Pattern regex pour extraire la clé Xray du titre du test */
+  /** Regex pattern to extract the Xray key from the test title */
   testKeyPattern?: RegExp;
   
-  /** Activer les logs détaillés */
+  /** Enable verbose logs */
   verbose?: boolean;
 }
 
 /**
- * Résultat d'un test formaté pour Xray
+ * A test result formatted for Xray.
  */
 export interface XrayTestResult {
   testKey: string;
@@ -68,7 +68,7 @@ export interface XrayTestResult {
 }
 
 /**
- * Pièce jointe Xray
+ * Xray attachment.
  */
 export interface XrayEvidence {
   data: string;
@@ -77,7 +77,7 @@ export interface XrayEvidence {
 }
 
 /**
- * Payload d'import des résultats Xray
+ * Payload for importing results into Xray.
  */
 export interface XrayImportPayload {
   testExecutionKey: string;
@@ -93,14 +93,14 @@ export interface XrayImportPayload {
 }
 
 /**
- * Réponse d'authentification Xray
+ * Xray authentication response.
  */
 export interface XrayAuthResponse {
   token: string;
 }
 
 /**
- * Réponse de création d'issue JIRA
+ * Response from a JIRA issue creation.
  */
 export interface JiraIssueResponse {
   id: string;
@@ -109,7 +109,7 @@ export interface JiraIssueResponse {
 }
 
 /**
- * Réponse de recherche JIRA
+ * JIRA search response.
  */
 export interface JiraSearchResponse {
   issues: Array<{
@@ -121,7 +121,7 @@ export interface JiraSearchResponse {
 }
 
 /**
- * Réponse GraphQL Xray - Get Test Plans
+ * Xray GraphQL response - Get Test Plans.
  */
 export interface XrayTestPlansResponse {
   data: {
@@ -137,7 +137,7 @@ export interface XrayTestPlansResponse {
 }
 
 /**
- * Réponse GraphQL Xray - Get Test Executions
+ * Xray GraphQL response - Get Test Executions.
  */
 export interface XrayTestExecutionsResponse {
   data: {
@@ -153,7 +153,7 @@ export interface XrayTestExecutionsResponse {
 }
 
 /**
- * Réponse GraphQL Xray - Mutation
+ * Xray GraphQL response - Mutation.
  */
 export interface XrayMutationResponse {
   data: {
@@ -170,7 +170,7 @@ export interface XrayMutationResponse {
 }
 
 /**
- * Projet JIRA
+ * JIRA project.
  */
 export interface JiraProject {
   id: string;
@@ -184,7 +184,7 @@ export interface JiraProject {
 }
 
 /**
- * Détails d'un test Playwright pour le mapping
+ * Details of a Playwright test used for mapping.
  */
 export interface PlaywrightTestDetails {
   title: string;
@@ -205,7 +205,7 @@ export interface PlaywrightTestDetails {
 }
 
 /**
- * Description JIRA au format ADF (Atlassian Document Format)
+ * JIRA description in ADF (Atlassian Document Format).
  */
 export interface JiraAdfDocument {
   type: 'doc';
@@ -213,9 +213,9 @@ export interface JiraAdfDocument {
   content: JiraAdfContent[];
 }
 
-export type JiraAdfContent = 
-  | JiraAdfParagraph 
-  | JiraAdfHeading 
+export type JiraAdfContent =
+  | JiraAdfParagraph
+  | JiraAdfHeading
   | JiraAdfTable
   | JiraAdfBulletList
   | JiraAdfCodeBlock;
