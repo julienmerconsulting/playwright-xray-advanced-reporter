@@ -27,15 +27,15 @@ import {
 } from './utils';
 
 /**
- * Reporter Playwright avancé pour Xray Cloud
- * 
- * Fonctionnalités :
- * - Création automatique de Test Execution dans JIRA
- * - Import des résultats vers Xray avec statuts détaillés
- * - Liaison automatique au Test Plan
- * - Gestion des environnements de test
- * - Upload des screenshots, traces et vidéos
- * - Description enrichie avec métriques
+ * Advanced Playwright reporter for Xray Cloud.
+ *
+ * Features:
+ * - Automatic Test Execution creation in JIRA
+ * - Imports results to Xray with detailed statuses
+ * - Automatic linking to a Test Plan
+ * - Test environments handling
+ * - Uploads screenshots, traces and videos
+ * - Rich description with metrics
  */
 export class XrayAdvancedReporter implements Reporter {
   private config: XrayReporterConfig;
@@ -78,68 +78,68 @@ export class XrayAdvancedReporter implements Reporter {
   }
 
   /**
-   * Appelé au début de l'exécution
+   * Called at the start of the execution.
    */
   async onBegin(config: FullConfig, suite: Suite): Promise<void> {
     this.startTime = new Date();
-    this.logger.info('Démarrage de l\'exécution Playwright');
+    this.logger.info('Starting Playwright execution');
     this.logger.debug(`Configuration: ${JSON.stringify(this.config, null, 2)}`);
 
     try {
-      // Authentification Xray
+      // Xray authentication
       await this.xrayClient.authenticate();
-      this.logger.success('Authentification Xray réussie');
+      this.logger.success('Xray authentication successful');
 
-      // Récupération des infos projet
+      // Fetch project information
       const project = await this.jiraClient.getProjectInfo(this.config.projectKey);
       this.projectId = project.id;
-      this.logger.debug(`Projet JIRA: ${project.name} (${project.id})`);
+      this.logger.debug(`JIRA project: ${project.name} (${project.id})`);
 
-      // Récupération du type Test Execution
+      // Fetch the Test Execution issue type
       this.testExecutionIssueTypeId = await this.jiraClient.getTestExecutionIssueTypeId(
         this.config.projectKey
       );
-      this.logger.debug(`Type Test Execution ID: ${this.testExecutionIssueTypeId}`);
+      this.logger.debug(`Test Execution type ID: ${this.testExecutionIssueTypeId}`);
 
-      // Résolution du Test Plan
+      // Resolve the Test Plan
       await this.resolveTestPlan();
 
     } catch (error) {
-      this.logger.error('Erreur initialisation:', error);
+      this.logger.error('Initialization error:', error);
       throw error;
     }
   }
 
   /**
-   * Résout la clé du Test Plan (fournie ou recherchée)
+   * Resolves the Test Plan key (provided or searched).
    */
   private async resolveTestPlan(): Promise<void> {
     if (this.config.testPlanKey) {
       this.testPlanKey = this.config.testPlanKey;
-      this.logger.info(`Test Plan configuré: ${this.testPlanKey}`);
+      this.logger.info(`Test Plan configured: ${this.testPlanKey}`);
     } else if (this.config.testPlanSummary) {
       this.testPlanKey = await this.jiraClient.findTestPlanBySummary(
         this.config.testPlanSummary,
         this.config.projectKey
       );
       if (this.testPlanKey) {
-        this.logger.info(`Test Plan trouvé par summary: ${this.testPlanKey}`);
+        this.logger.info(`Test Plan found by summary: ${this.testPlanKey}`);
       } else {
         this.logger.warn(
-          `Test Plan non trouvé pour summary: "${this.config.testPlanSummary}"`
+          `Test Plan not found for summary: "${this.config.testPlanSummary}"`
         );
       }
     }
   }
 
   /**
-   * Appelé à la fin de chaque test
+   * Called at the end of each test.
    */
   onTestEnd(test: TestCase, result: TestResult): void {
     const testKey = this.resolveTestKey(test);
-    
+
     if (!testKey) {
-      this.logger.debug(`Test ignoré (pas de clé Xray): ${test.title}`);
+      this.logger.debug(`Test skipped (no Xray key): ${test.title}`);
       return;
     }
 
@@ -162,78 +162,78 @@ export class XrayAdvancedReporter implements Reporter {
     };
 
     this.testResults.set(testKey, details);
-    
-    const statusEmoji = result.status === 'passed' ? '✅' : 
+
+    const statusEmoji = result.status === 'passed' ? '✅' :
                         result.status === 'failed' ? '❌' : '⏭️';
     this.logger.debug(`${statusEmoji} ${testKey}: ${test.title} (${result.duration}ms)`);
   }
 
   /**
-   * Résout la clé Xray d'un test
+   * Resolves the Xray key of a test.
    */
   private resolveTestKey(test: TestCase): string | null {
-    // 1. Mapping explicite
+    // 1. Explicit mapping
     if (this.config.testKeyMapping) {
       const mappedKey = this.config.testKeyMapping[test.title];
       if (mappedKey) return mappedKey;
     }
 
-    // 2. Extraction depuis le titre
+    // 2. Extraction from the title
     const extractedKey = extractTestKeyFromTitle(
       test.title,
       this.config.testKeyPattern
     );
     if (extractedKey) return extractedKey;
 
-    // 3. Extraction depuis le fullTitle
+    // 3. Extraction from the fullTitle
     const fullTitle = test.titlePath().join(' ');
     return extractTestKeyFromTitle(fullTitle, this.config.testKeyPattern);
   }
 
   /**
-   * Appelé à la fin de l'exécution complète
+   * Called at the end of the full execution.
    */
   async onEnd(result: FullResult): Promise<void> {
     this.endTime = new Date();
     const totalDuration = this.endTime.getTime() - this.startTime.getTime();
 
-    this.logger.info(`Exécution terminée: ${result.status}`);
-    this.logger.info(`Tests avec clé Xray: ${this.testResults.size}`);
+    this.logger.info(`Execution finished: ${result.status}`);
+    this.logger.info(`Tests with Xray key: ${this.testResults.size}`);
 
     if (this.testResults.size === 0) {
-      this.logger.warn('Aucun test avec clé Xray trouvé. Rien à reporter.');
+      this.logger.warn('No test with Xray key found. Nothing to report.');
       return;
     }
 
     try {
-      // Création de la Test Execution dans JIRA
+      // Create the Test Execution in JIRA
       await this.createTestExecutionInJira(totalDuration);
 
-      // Import des résultats dans Xray
+      // Import results into Xray
       await this.importResultsToXray();
 
-      // Liaison au Test Plan via GraphQL
+      // Link to the Test Plan via GraphQL
       await this.linkTestExecutionToTestPlan();
 
-      // Ajout des environnements
+      // Add environments
       await this.addTestEnvironments();
 
-      // Upload des attachments
+      // Upload attachments
       await this.uploadAttachments();
 
-      this.logger.success(`Reporting terminé: ${this.testExecutionKey}`);
+      this.logger.success(`Reporting finished: ${this.testExecutionKey}`);
       this.logger.info(
         `🔗 ${this.config.jiraBaseUrl}/browse/${this.testExecutionKey}`
       );
 
     } catch (error) {
-      this.logger.error('Erreur lors du reporting:', error);
+      this.logger.error('Error during reporting:', error);
       throw error;
     }
   }
 
   /**
-   * Crée la Test Execution dans JIRA
+   * Creates the Test Execution in JIRA.
    */
   private async createTestExecutionInJira(totalDuration: number): Promise<void> {
     const stats = this.calculateStats();
@@ -264,11 +264,11 @@ export class XrayAdvancedReporter implements Reporter {
     );
 
     this.testExecutionKey = response.key;
-    this.logger.success(`Test Execution créée: ${this.testExecutionKey}`);
+    this.logger.success(`Test Execution created: ${this.testExecutionKey}`);
   }
 
   /**
-   * Calcule les statistiques des tests
+   * Calculates test statistics.
    */
   private calculateStats(): { total: number; passed: number; failed: number; skipped: number } {
     let passed = 0;
@@ -300,17 +300,17 @@ export class XrayAdvancedReporter implements Reporter {
   }
 
   /**
-   * Collecte les environnements uniques des tests
+   * Collects unique environments from tests.
    */
   private collectEnvironments(): string[] {
     const envs = new Set<string>();
 
-    // Environnements configurés
+    // Configured environments
     if (this.config.testEnvironments) {
       this.config.testEnvironments.forEach((e) => envs.add(e));
     }
 
-    // Environnements depuis les projets Playwright
+    // Environments from Playwright projects
     for (const details of this.testResults.values()) {
       if (details.projectName && details.projectName !== 'default') {
         envs.add(details.projectName);
@@ -321,7 +321,7 @@ export class XrayAdvancedReporter implements Reporter {
   }
 
   /**
-   * Import les résultats vers Xray
+   * Imports results into Xray.
    */
   private async importResultsToXray(): Promise<void> {
     const tests: XrayTestResult[] = [];
@@ -343,7 +343,7 @@ export class XrayAdvancedReporter implements Reporter {
       tests,
     };
 
-    // Ajouter le Test Plan si disponible
+    // Add the Test Plan if available
     if (this.testPlanKey) {
       payload.info = {
         testPlanKey: this.testPlanKey,
@@ -351,22 +351,22 @@ export class XrayAdvancedReporter implements Reporter {
     }
 
     await this.xrayClient.importExecutionResults(payload);
-    this.logger.success(`${tests.length} résultats importés dans Xray`);
+    this.logger.success(`${tests.length} results imported into Xray`);
   }
 
   /**
-   * Construit le commentaire pour un test
+   * Builds the comment for a test.
    */
   private buildTestComment(details: PlaywrightTestDetails): string {
     const lines: string[] = [];
 
-    lines.push(`📁 Fichier: ${details.file}:${details.line}`);
-    lines.push(`⏱️ Durée: ${details.duration}ms`);
-    lines.push(`🖥️ Projet: ${details.projectName}`);
+    lines.push(`📁 File: ${details.file}:${details.line}`);
+    lines.push(`⏱️ Duration: ${details.duration}ms`);
+    lines.push(`🖥️ Project: ${details.projectName}`);
 
     if (details.error) {
       lines.push('');
-      lines.push('❌ Erreur:');
+      lines.push('❌ Error:');
       lines.push(truncateErrorMessage(details.error, 2000));
     }
 
@@ -374,16 +374,16 @@ export class XrayAdvancedReporter implements Reporter {
   }
 
   /**
-   * Lie la Test Execution au Test Plan via GraphQL
+   * Links the Test Execution to the Test Plan via GraphQL.
    */
   private async linkTestExecutionToTestPlan(): Promise<void> {
     if (!this.testPlanKey) {
-      this.logger.debug('Pas de Test Plan configuré, liaison ignorée');
+      this.logger.debug('No Test Plan configured, linking skipped');
       return;
     }
 
     try {
-      // Récupérer les issueIds Xray
+      // Fetch Xray issueIds
       const testPlanIssueId = await this.xrayClient.getTestPlanIssueId(
         this.testPlanKey
       );
@@ -392,7 +392,7 @@ export class XrayAdvancedReporter implements Reporter {
       );
 
       if (!testPlanIssueId || !testExecIssueId) {
-        this.logger.warn('Impossible de récupérer les issueIds Xray');
+        this.logger.warn('Unable to fetch Xray issueIds');
         return;
       }
 
@@ -402,16 +402,16 @@ export class XrayAdvancedReporter implements Reporter {
       );
 
       this.logger.success(
-        `Test Execution liée au Test Plan ${this.testPlanKey}`
+        `Test Execution linked to Test Plan ${this.testPlanKey}`
       );
 
     } catch (error) {
-      this.logger.warn('Erreur liaison Test Plan:', error);
+      this.logger.warn('Test Plan linking error:', error);
     }
   }
 
   /**
-   * Ajoute les environnements à la Test Execution
+   * Adds environments to the Test Execution.
    */
   private async addTestEnvironments(): Promise<void> {
     const environments = this.collectEnvironments();
@@ -426,7 +426,7 @@ export class XrayAdvancedReporter implements Reporter {
       );
 
       if (!testExecIssueId) {
-        this.logger.warn('Impossible de récupérer issueId pour les environnements');
+        this.logger.warn('Unable to fetch issueId for environments');
         return;
       }
 
@@ -435,15 +435,15 @@ export class XrayAdvancedReporter implements Reporter {
         environments
       );
 
-      this.logger.success(`Environnements ajoutés: ${environments.join(', ')}`);
+      this.logger.success(`Environments added: ${environments.join(', ')}`);
 
     } catch (error) {
-      this.logger.warn('Erreur ajout environnements:', error);
+      this.logger.warn('Error adding environments:', error);
     }
   }
 
   /**
-   * Upload les attachments (screenshots, traces, vidéos)
+   * Uploads attachments (screenshots, traces, videos).
    */
   private async uploadAttachments(): Promise<void> {
     if (
@@ -457,7 +457,7 @@ export class XrayAdvancedReporter implements Reporter {
     const filesToUpload: string[] = [];
 
     for (const details of this.testResults.values()) {
-      // Screenshots uniquement en cas d'échec si configuré ainsi
+      // Screenshots only on failure when configured
       const includeScreenshots =
         this.config.uploadScreenshotsOnFailure &&
         (details.status === 'failed' || details.status === 'timedOut');
@@ -475,7 +475,7 @@ export class XrayAdvancedReporter implements Reporter {
       return;
     }
 
-    this.logger.info(`Upload de ${filesToUpload.length} attachments...`);
+    this.logger.info(`Uploading ${filesToUpload.length} attachments...`);
 
     const result = await this.jiraClient.addMultipleAttachments(
       this.testExecutionKey!,
@@ -483,16 +483,16 @@ export class XrayAdvancedReporter implements Reporter {
     );
 
     if (result.success.length > 0) {
-      this.logger.success(`${result.success.length} attachments uploadés`);
+      this.logger.success(`${result.success.length} attachments uploaded`);
     }
 
     if (result.failed.length > 0) {
-      this.logger.warn(`${result.failed.length} attachments en échec`);
+      this.logger.warn(`${result.failed.length} attachments failed`);
     }
   }
 
   /**
-   * Affiche un résumé à la console
+   * Prints a summary to the console.
    */
   printsToStdio(): boolean {
     return true;
