@@ -14,14 +14,14 @@ import {
 } from '../types';
 
 /**
- * Formate une date en ISO 8601 avec timezone
+ * Formats a date as ISO 8601 with timezone.
  */
 export function formatDateISO(date: Date): string {
   return date.toISOString().replace('Z', '+00:00');
 }
 
 /**
- * Formate une durée en millisecondes en format lisible
+ * Formats a duration in milliseconds as a human-readable string.
  */
 export function formatDuration(ms: number): string {
   if (ms < 1000) {
@@ -36,18 +36,18 @@ export function formatDuration(ms: number): string {
 }
 
 /**
- * Extrait la clé Xray d'un titre de test
- * Patterns supportés:
- * - "[PROJ-123] Mon test"
- * - "PROJ-123 - Mon test"
- * - "Mon test @PROJ-123"
- * - Pattern regex personnalisé
+ * Extracts the Xray key from a test title.
+ * Supported patterns:
+ * - "[PROJ-123] My test"
+ * - "PROJ-123 - My test"
+ * - "My test @PROJ-123"
+ * - Custom regex pattern
  */
 export function extractTestKeyFromTitle(
   title: string,
   customPattern?: RegExp
 ): string | null {
-  // Pattern personnalisé en priorité
+  // Custom pattern takes priority
   if (customPattern) {
     const match = title.match(customPattern);
     if (match && match[1]) {
@@ -55,12 +55,12 @@ export function extractTestKeyFromTitle(
     }
   }
 
-  // Patterns par défaut
+  // Default patterns
   const patterns = [
-    /^\[([A-Z][A-Z0-9]*-\d+)\]/, // [PROJ-123] au début
-    /^([A-Z][A-Z0-9]*-\d+)\s*[-:]/, // PROJ-123 - au début
-    /@([A-Z][A-Z0-9]*-\d+)/, // @PROJ-123 n'importe où
-    /\(([A-Z][A-Z0-9]*-\d+)\)$/, // (PROJ-123) à la fin
+    /^\[([A-Z][A-Z0-9]*-\d+)\]/, // [PROJ-123] at the start
+    /^([A-Z][A-Z0-9]*-\d+)\s*[-:]/, // PROJ-123 - at the start
+    /@([A-Z][A-Z0-9]*-\d+)/, // @PROJ-123 anywhere
+    /\(([A-Z][A-Z0-9]*-\d+)\)$/, // (PROJ-123) at the end
   ];
 
   for (const pattern of patterns) {
@@ -74,7 +74,7 @@ export function extractTestKeyFromTitle(
 }
 
 /**
- * Convertit le statut Playwright en statut Xray
+ * Converts a Playwright status to an Xray status.
  */
 export function mapPlaywrightStatusToXray(
   status: PlaywrightTestDetails['status']
@@ -94,7 +94,7 @@ export function mapPlaywrightStatusToXray(
 }
 
 /**
- * Crée un document ADF simple avec du texte
+ * Creates a simple ADF document with text.
  */
 export function createAdfText(text: string): JiraAdfDocument {
   return {
@@ -110,7 +110,7 @@ export function createAdfText(text: string): JiraAdfDocument {
 }
 
 /**
- * Crée un paragraphe ADF
+ * Creates an ADF paragraph.
  */
 export function createAdfParagraph(
   texts: Array<{ text: string; bold?: boolean; code?: boolean }>
@@ -133,7 +133,7 @@ export function createAdfParagraph(
 }
 
 /**
- * Crée un heading ADF
+ * Creates an ADF heading.
  */
 export function createAdfHeading(
   text: string,
@@ -147,7 +147,7 @@ export function createAdfHeading(
 }
 
 /**
- * Crée une cellule de tableau ADF
+ * Creates an ADF table cell.
  */
 function createAdfTableCell(
   content: string,
@@ -174,7 +174,7 @@ function createAdfTableCell(
 }
 
 /**
- * Crée un tableau ADF à partir de données
+ * Creates an ADF table from data.
  */
 export function createAdfTable(
   headers: string[],
@@ -203,7 +203,7 @@ export function createAdfTable(
 }
 
 /**
- * Crée une description ADF complète pour une Test Execution
+ * Creates a full ADF description for a Test Execution.
  */
 export function createTestExecutionDescription(
   totalTests: number,
@@ -218,18 +218,18 @@ export function createTestExecutionDescription(
   const passRate = totalTests > 0 ? ((passed / totalTests) * 100).toFixed(1) : '0';
 
   const content: JiraAdfContent[] = [
-    createAdfHeading('Résumé Exécution Playwright', 2),
+    createAdfHeading('Playwright Execution Summary', 2),
     createAdfTable(
-      ['Métrique', 'Valeur'],
+      ['Metric', 'Value'],
       [
         ['Total Tests', totalTests.toString()],
         ['✅ Passed', passed.toString()],
         ['❌ Failed', failed.toString()],
         ['⏭️ Skipped', skipped.toString()],
         ['📊 Pass Rate', `${passRate}%`],
-        ['⏱️ Durée Totale', formatDuration(duration)],
-        ['🕐 Démarrage', startTime.toISOString()],
-        ['🌍 Environnements', environments.join(', ') || 'N/A'],
+        ['⏱️ Total Duration', formatDuration(duration)],
+        ['🕐 Started', startTime.toISOString()],
+        ['🌍 Environments', environments.join(', ') || 'N/A'],
       ]
     ),
   ];
@@ -245,7 +245,7 @@ export function createTestExecutionDescription(
 
   content.push(
     createAdfParagraph([
-      { text: '🤖 Exécution automatisée via playwright-xray-advanced-reporter' },
+      { text: '🤖 Automated execution via playwright-xray-advanced-reporter' },
     ])
   );
 
@@ -257,7 +257,7 @@ export function createTestExecutionDescription(
 }
 
 /**
- * Lit un fichier en base64
+ * Reads a file as base64.
  */
 export function readFileAsBase64(filePath: string): string {
   const buffer = fs.readFileSync(filePath);
@@ -265,7 +265,7 @@ export function readFileAsBase64(filePath: string): string {
 }
 
 /**
- * Détermine le content type d'un fichier basé sur son extension
+ * Determines the content type of a file based on its extension.
  */
 export function getContentType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
@@ -287,7 +287,7 @@ export function getContentType(filePath: string): string {
 }
 
 /**
- * Collecte les attachments d'un test (screenshots, traces, videos)
+ * Collects attachments from a test (screenshots, traces, videos).
  */
 export function collectTestAttachments(
   test: PlaywrightTestDetails,
@@ -324,7 +324,7 @@ export function collectTestAttachments(
 }
 
 /**
- * Génère un summary pour la Test Execution
+ * Generates a summary for the Test Execution.
  */
 export function generateTestExecutionSummary(
   prefix: string,
@@ -337,7 +337,7 @@ export function generateTestExecutionSummary(
 }
 
 /**
- * Tronque un message d'erreur pour Xray (max 32767 caractères)
+ * Truncates an error message for Xray (max 32767 characters).
  */
 export function truncateErrorMessage(
   error: string | undefined,
@@ -349,7 +349,7 @@ export function truncateErrorMessage(
 }
 
 /**
- * Logger avec niveaux
+ * Logger with levels.
  */
 export class Logger {
   private verbose: boolean;
