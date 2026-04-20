@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "test": "ts-node tests/e2e-mock.test.ts",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "playwright",
