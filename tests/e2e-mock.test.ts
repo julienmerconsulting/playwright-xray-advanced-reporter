@@ -137,6 +137,10 @@ global.fetch = (async (input: any, init?: RequestInit) => {
   } catch {
     parsedBody = body;
   }
+  if (process.env.HTTP_VERBOSE) {
+    console.log(`→ ${(init?.method || 'GET').toUpperCase()} ${url}`);
+    if (parsedBody) console.log(`  body: ${JSON.stringify(parsedBody).slice(0, 200)}`);
+  }
   calls.push({
     url,
     method: (init?.method || 'GET').toUpperCase(),
@@ -184,7 +188,7 @@ async function main() {
     testExecutionLabels: ['Automation', 'Playwright'],
     testEnvironments: ['Chrome'],
     uploadScreenshotsOnFailure: false,
-    verbose: false,
+    verbose: true,
   };
 
   const reporter = new XrayAdvancedReporter(config);
