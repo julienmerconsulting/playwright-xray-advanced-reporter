@@ -6,8 +6,8 @@ import {
 } from '../types';
 
 /**
- * Client pour l'API Xray Cloud (REST v2 + GraphQL)
- * Gère l'authentification, l'import des résultats et les mutations GraphQL
+ * Client for the Xray Cloud API (REST v2 + GraphQL).
+ * Handles authentication, result imports and GraphQL mutations.
  */
 export class XrayClient {
   private static readonly BASE_URL = 'https://xray.cloud.getxray.app';
@@ -26,10 +26,10 @@ export class XrayClient {
   }
 
   /**
-   * Authentification et récupération du token JWT
+   * Authenticates and fetches the JWT token.
    */
   async authenticate(): Promise<string> {
-    // Vérifier si le token est encore valide (avec marge de 5 minutes)
+    // Check if the token is still valid (with a 5-minute margin)
     if (this.token && this.tokenExpiry) {
       const now = new Date();
       const margin = 5 * 60 * 1000; // 5 minutes
@@ -56,22 +56,22 @@ export class XrayClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[XRAY] Échec authentification: ${response.status} - ${errorBody}`
+        `[XRAY] Authentication failed: ${response.status} - ${errorBody}`
       );
     }
 
-    // Le token est retourné comme string directe (avec quotes)
+    // The token is returned as a raw string (with quotes)
     const tokenRaw = await response.text();
-    this.token = tokenRaw.replace(/^"|"$/g, ''); // Enlever les quotes
+    this.token = tokenRaw.replace(/^"|"$/g, ''); // Strip the quotes
 
-    // Les tokens Xray expirent généralement après 1 heure
+    // Xray tokens typically expire after 1 hour
     this.tokenExpiry = new Date(Date.now() + 55 * 60 * 1000);
 
     return this.token;
   }
 
   /**
-   * Récupère le token, en s'authentifiant si nécessaire
+   * Returns the token, authenticating if needed.
    */
   private async getToken(): Promise<string> {
     if (!this.token) {
@@ -81,7 +81,7 @@ export class XrayClient {
   }
 
   /**
-   * Import des résultats d'exécution vers Xray
+   * Imports execution results into Xray.
    */
   async importExecutionResults(payload: XrayImportPayload): Promise<unknown> {
     const token = await this.getToken();
@@ -102,7 +102,7 @@ export class XrayClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[XRAY] Échec import résultats: ${response.status} - ${errorBody}`
+        `[XRAY] Failed to import results: ${response.status} - ${errorBody}`
       );
     }
 
@@ -110,7 +110,7 @@ export class XrayClient {
   }
 
   /**
-   * Exécute une requête GraphQL
+   * Executes a GraphQL query.
    */
   private async executeGraphQL<T>(query: string): Promise<T> {
     const token = await this.getToken();
@@ -130,7 +130,7 @@ export class XrayClient {
     if (!response.ok) {
       const errorBody = await response.text();
       throw new Error(
-        `[XRAY] Échec requête GraphQL: ${response.status} - ${errorBody}`
+        `[XRAY] GraphQL request failed: ${response.status} - ${errorBody}`
       );
     }
 
@@ -138,7 +138,7 @@ export class XrayClient {
 
     if (result.errors) {
       throw new Error(
-        `[XRAY] Erreurs GraphQL: ${JSON.stringify(result.errors)}`
+        `[XRAY] GraphQL errors: ${JSON.stringify(result.errors)}`
       );
     }
 
@@ -146,7 +146,7 @@ export class XrayClient {
   }
 
   /**
-   * Récupère l'issueId Xray d'un Test Plan via sa clé JIRA
+   * Fetches the Xray issueId of a Test Plan from its JIRA key.
    */
   async getTestPlanIssueId(jiraKey: string): Promise<string | null> {
     const query = `{
@@ -167,7 +167,7 @@ export class XrayClient {
   }
 
   /**
-   * Récupère l'issueId Xray d'une Test Execution via sa clé JIRA
+   * Fetches the Xray issueId of a Test Execution from its JIRA key.
    */
   async getTestExecutionIssueId(jiraKey: string): Promise<string | null> {
     const query = `{
@@ -188,7 +188,7 @@ export class XrayClient {
   }
 
   /**
-   * Associe une Test Execution à un Test Plan
+   * Links a Test Execution to a Test Plan.
    */
   async addTestExecutionToTestPlan(
     testPlanIssueId: string,
@@ -208,7 +208,7 @@ export class XrayClient {
   }
 
   /**
-   * Associe plusieurs Test Executions à un Test Plan
+   * Links multiple Test Executions to a Test Plan.
    */
   async addMultipleTestExecutionsToTestPlan(
     testPlanIssueId: string,
@@ -230,7 +230,7 @@ export class XrayClient {
   }
 
   /**
-   * Ajoute des environnements de test à une Test Execution
+   * Adds test environments to a Test Execution.
    */
   async addTestEnvironmentsToTestExecution(
     testExecIssueId: string,
@@ -253,7 +253,7 @@ export class XrayClient {
   }
 
   /**
-   * Récupère les Tests associés à un Test Plan
+   * Fetches the Tests associated with a Test Plan.
    */
   async getTestsFromTestPlan(
     testPlanIssueId: string,
@@ -294,7 +294,7 @@ export class XrayClient {
   }
 
   /**
-   * Récupère les détails d'une Test Execution
+   * Fetches the details of a Test Execution.
    */
   async getTestExecutionDetails(testExecIssueId: string): Promise<{
     issueId: string;
