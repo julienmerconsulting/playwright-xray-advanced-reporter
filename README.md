@@ -221,6 +221,25 @@ Enable `verbose: true` to see which pattern matched and which key was extracted.
 **Multi-project runs and test keys**
 Same Xray key can be mapped to tests across several Playwright projects (`chromium`, `firefox`, `webkit`). Each project is imported as a separate test run tied to the same Xray Test.
 
+## Development
+
+Run the bundled E2E mock test (no network, mocks `fetch` against JIRA + Xray):
+
+```bash
+npm install
+npm test
+```
+
+`npm test` runs with `HTTP_VERBOSE=1` by default, so every intercepted request is printed live with its method, URL and body — useful to inspect the exact payloads sent to JIRA and Xray.
+
+To silence the per-request logs and see only the assertion summary:
+
+```bash
+cross-env HTTP_VERBOSE=0 ts-node tests/e2e-mock.test.ts
+```
+
+To also disable the Reporter's own `🔍 debug` logs, flip `verbose: false` in the test config (`tests/e2e-mock.test.ts`).
+
 ## Compatibility
 
 - **Playwright** `>= 1.20.0`
