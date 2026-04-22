@@ -1,6 +1,6 @@
 {
   "name": "playwright-xray-advanced-reporter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Advanced Playwright Reporter for Xray Cloud - Full API integration with Test Plans, Environments, and Attachments",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
