@@ -1,9 +1,17 @@
 {
   "name": "playwright-xray-advanced-reporter",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Advanced Playwright Reporter for Xray Cloud - Full API integration with Test Plans, Environments, and Attachments",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julienmerconsulting/playwright-xray-advanced-reporter.git"
+  },
+  "homepage": "https://github.com/julienmerconsulting/playwright-xray-advanced-reporter#readme",
+  "bugs": {
+    "url": "https://github.com/julienmerconsulting/playwright-xray-advanced-reporter/issues"
+  },
   "scripts": {
     "build": "tsc",
     "test": "cross-env HTTP_VERBOSE=1 ts-node tests/e2e-mock.test.ts",
@@ -11,14 +19,21 @@
   },
   "keywords": [
     "playwright",
+    "playwright-reporter",
     "xray",
+    "xray-cloud",
     "jira",
     "test-management",
     "reporter",
-    "automation"
+    "automation",
+    "e2e",
+    "qa"
   ],
-  "author": "JMer Consulting",
+  "author": "Julien Mer <contact@julienmerconsulting.com> (JMer Consulting)",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "peerDependencies": {
     "@playwright/test": ">=1.20.0"
   },
@@ -33,6 +48,8 @@
     "typescript": "^5.3.0"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
   ]
 }
